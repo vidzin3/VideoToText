@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    *,html{
+        padding: 0;
+    }
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    th,td{
+        padding: 10px;
+    }
+</style>
+<body>
+    <div style="display: flex;flex-direction: column; width: 100%;height: 100vh;overflow-y: auto;">
+        <div style="flex-direction: column;flex: 1 1 auto;display: flex;">
+            <div style="display: flex;">
+                <label for="" style="margin-right: 10px;">Input Link Youtube video</label> 
+                <textarea rows="10" cols="50" id="link_video" value="https://youtu.be/Kt8oVbdcCIc?si=vKzCQ6DQqhn8kpu3"></textarea>
+            </div>
+            <div style="display: flex; padding: 20px;">
+                <button id="btn_action" style="margin-right: 23px;">Convert The Video</button>
+                <button id="btn_action_clear">Clear the link</button>
+            </div>
+        </div>
+        <div style="flex-direction: column;flex: 1 0 auto;">
+            <div style="display: flex;">
+                <table style="width: 100%;text-align: left;">
+                    <tr>
+                        <th>text</th>
+                        <th>duration / s</th>
+                        <th>offset/start</th>
+                        <th>lang</th>
+                    </tr>
+                    <tbody id="list_text"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+const button_action = document.getElementById('btn_action');
+const button_action_clear = document.getElementById('btn_action_clear');
+const tr_list = document.getElementById('list_text')
+
+    button_action.addEventListener('click', async () => {
+        const link = document.getElementById('link_video').value;
+
+        const response = await fetch('http://localhost:3000/transcript', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url: link })
+        });
+
+        const data = await response.json();
+        let row = ""
+        data.forEach((e) => {
+            row += `
+                <tr>
+                    <td>${e.text}</td>
+                    <td>${e.duration}s</td>
+                    <td>${e.offset}</td>
+                    <td>${e.lang}</td>
+                <tr>
+            `
+        })
+
+        tr_list.innerHTML += row
+    });
+
+    button_action_clear.addEventListener('click',() => {
+        const link = document.getElementById('link_video').value;
+
+        link = ""
+
+        tr_list.innerHTML = ""
+    })
+</script>
+</html>
